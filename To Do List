@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>To-Do List – Purple & Black Theme</title>
+<style>
+:root{
+--bg: #1a0033; /* Deep purple */
+--panel: #0d001a; /* Very dark purple */
+--muted: #b38fcc; /* Light purple */
+--text: #ffffff; /* White */
+--accent: #9933ff; /* Bright purple */
+--accent-2: #00cc99; /* Teal green */
+--danger: #ff3366; /* Pink red */
+--ring: 0 0 0 3px rgba(153, 51, 255, 0.5);
+--transition: all 0.2s ease;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,\
+Cantarell,Noto Sans,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
+background: linear-gradient(135deg, #0d001a 0%, #1a0033 50%, #0d001a 100%);
+color:var(--text);
+display:flex; align-items:center; justify-content:center; padding:24px;
+}
+.app{
+width:100%; max-width:720px; 
+background:var(--panel); 
+border:1px solid #330066; 
+border-radius:18px; 
+box-shadow:0 10px 30px rgba(0,0,0,.6);
+overflow: hidden;
+transition: var(--transition);
+}
+header{
+padding:20px 22px; 
+border-bottom:1px solid #330066; 
+display:flex; 
+align-items:center; 
+gap:12px;
+flex-wrap: wrap;
+}
+header h1{margin:0; font-size:20px; letter-spacing:.3px}
+.badge{
+font-size:12px; 
+padding:4px 8px; 
+border-radius:999px; 
+background:rgba(153, 51, 255, 0.2); 
+color:#e6ccff;
+transition: var(--transition);
+}
+.controls{
+display:grid; 
+grid-template-columns:1fr auto; 
+gap:10px; 
+padding:18px 22px;
+position: relative;
+}
+.input-wrapper {
+position: relative;
+width: 100%;
+}
+input[type="text"]{
+width:100%; 
+padding:14px 14px; 
+border-radius:12px; 
+border:1px solid #330066; 
+background:#160029; 
+color:var(--text);
+transition: var(--transition);
+}
+input[type="text"]:focus{
+outline:none; 
+box-shadow:var(--ring); 
+border-color:#9933ff;
+transform: translateY(-1px);
+}
+input[type="text"].error {
+border-color: var(--danger);
+box-shadow: 0 0 0 3px rgba(255, 51, 102, 0.35);
+}
+.error-message {
+position: absolute;
+bottom: -20px;
+left: 0;
+font-size: 12px;
+color: var(--danger);
+display: none;
+}
+button{
+padding:12px 16px; 
+border-radius:12px; 
+border:1px solid #330066; 
+background:var(--accent); 
+color:white; 
+font-weight:600; 
+cursor:pointer;
+transition: var(--transition);
+}
+button:hover {
+transform: translateY(-1px);
+box-shadow: 0 4px 12px rgba(153, 51, 255, 0.4);
+}
+button:active {
+transform: translateY(0);
+}
+button:disabled{opacity:.6; cursor:not-allowed; transform: none; box-shadow: none;}
+.toolbar{
+display:flex; 
+flex-wrap:wrap; 
+gap:8px; 
+align-items:center; 
+padding:0 22px 12px;
+justify-content: space-between;
+}
+.filter{display:flex; gap:6px}
+.filter button{
+background:#160029; 
+color:var(--muted); 
+border-color:#330066;
+font-size: 14px;
+padding: 8px 12px;
+}
+.filter button.active{
+background:#4d0099; 
+color:#e6ccff;
+}
+.muted{color:var(--muted); font-size:14px}
+ul{list-style:none; margin:0; padding:0 12px 12px; max-height: 400px; overflow-y: auto;}
+li{
+display:grid; 
+grid-template-columns:auto 1fr auto; 
+align-items:center; 
+gap:12px; 
+padding:12px; 
+margin:10px; 
+border:1px solid #330066; 
+background:#160029; 
+border-radius:14px;
+transition: var(--transition);
+transform-origin: center top;
+}
+li.adding {
+animation: slideIn 0.3s ease;
+}
+li.removing {
+animation: slideOut 0.3s ease;
+}
+li:hover {
+border-color: #4d0099;
+transform: translateY(-2px);
+box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+li.completed .text{color:#8c8c8c; text-decoration:line-through}
+.text[contenteditable="true"]{outline:none}
+.text:focus{
+box-shadow:var(--ring); 
+border-radius:6px;
+}
+.checkbox{
+width:20px; 
+height:20px;
+cursor: pointer;
+transition: var(--transition);
+}
+.checkbox:checked {
+accent-color: var(--accent-2);
+}
+.delete{
+background:#330066; 
+color:#ffccdd; 
+border-color:#4d0099;
+padding: 8px 12px;
+font-size: 14px;
+}
+.delete:hover{
+background:#4d0099; 
+color:white;
+}
+.clear{background:var(--danger)}
+footer{
+display:flex; 
+justify-content:space-between; 
+align-items:center; 
+gap:10px; 
+padding:12px 22px 22px;
+flex-wrap: wrap;
+}
+.empty-state {
+text-align: center;
+padding: 30px 20px;
+color: var(--muted);
+}
+.empty-state.hidden {
+display: none;
+}
+.empty-state p {
+margin: 10px 0 0;
+}
+@keyframes slideIn {
+from {
+opacity: 0;
+transform: translateY(-10px);
+}
+to {
+opacity: 1;
+transform: translateY(0);
+}
+}
+@keyframes slideOut {
+from {
+opacity: 1;
+transform: translateY(0);
+}
+to {
+opacity: 0;
+transform: translateY(-10px);
+}
+}
+@media (max-width:520px){
+.controls{grid-template-columns:1fr}
+button.add{width:100%}
+.toolbar {
+flex-direction: column;
+align-items: flex-start;
+}
+.filter {
+width: 100%;
+justify-content: space-between;
+}
+.filter button {
+flex: 1;
+text-align: center;
+}
+footer {
+flex-direction: column;
+align-items: flex-start;
+gap: 15px;
+}
+}
+</style>
+</head>
+<body>
+<main class="app" aria-labelledby="title">
+<header>
+<h1 id="title">To-Do List</h1>
+<span class="badge" id="badge" aria-live="polite">0 remaining</span>
+</header>
+<section class="controls" aria-label="Add a new task">
+<div class="input-wrapper">
+<input id="newTask" type="text" placeholder="What needs to be done? (Press Enter)" autocomplete="off" />
+<div class="error-message" id="errorMessage">Task cannot be empty</div>
+</div>
+<button class="add" id="addBtn" aria-label="Add task">Add</button>
+</section>
+<div class="toolbar" aria-label="Filters and actions">
+<div class="filter" role="tablist" aria-label="Filter tasks">
+<button role="tab" class="filter-btn active" data-filter="all" aria-selected="true">All</button>
+<button role="tab" class="filter-btn" data-filter="active" aria-selected="false">Active</button>
+<button role="tab" class="filter-btn" data-filter="completed" aria-selected="false">Completed</button>
+</div>
+<span class="muted" id="hint">Tip: Double-click a task to edit.</span>
+</div>
+<ul id="list" aria-live="polite" aria-label="Task list"></ul>
+<div class="empty-state" id="emptyState" aria-live="polite">
+<p>No tasks to show</p>
+</div>
+<footer>
+<button class="clear" id="clearCompleted">Clear Completed</button>
+<span class="muted" id="meta"></span>
+</footer>
+</main>
+<script>
+// ===== State & Persistence =====
+const STORAGE_KEY = 'todo.tasks.v1';
+let tasks = load();
+let filter = 'all'; // 'all' | 'active' | 'completed'
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); }
+function load(){
+try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+catch { return []; }
+}
+
+// ===== DOM Refs =====
+const listEl = document.getElementById('list');
+const inputEl = document.getElementById('newTask');
+const addBtn = document.getElementById('addBtn');
+const badgeEl = document.getElementById('badge');
+const metaEl = document.getElementById('meta');
+const clearBtn = document.getElementById('clearCompleted');
+const filterBtns = Array.from(document.querySelectorAll('.filter-btn'));
+const errorMessage = document.getElementById('errorMessage');
+const emptyState = document.getElementById('emptyState');
+
+// ===== Utilities =====
+const uid = () => crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36)+Math.random().toString(36).slice(2);
+function getFiltered(){
+switch(filter){
+case 'active': return tasks.filter(t=>!t.completed);
+case 'completed': return tasks.filter(t=>t.completed);
+default: return tasks;
+}
+}
+function remainingCount(){ return tasks.filter(t=>!t.completed).length; }
+
+// ===== Rendering =====
+function render(){
+listEl.innerHTML = '';
+const visible = getFiltered();
+  
+// Show empty state if no tasks
+if (visible.length === 0) {
+emptyState.classList.remove('hidden');
+} else {
+emptyState.classList.add('hidden');
+}
+  
+for(const t of visible){
+const li = document.createElement('li');
+li.id = `task-${t.id}`;
+if(t.completed) li.classList.add('completed');
+    
+const cb = document.createElement('input');
+cb.type = 'checkbox'; cb.className = 'checkbox'; cb.checked = t.completed;
+cb.ariaLabel = `Mark ${t.text} ${t.completed? 'incomplete':'complete'}`;
+cb.addEventListener('change', ()=>{
+t.completed = cb.checked; 
+save(); 
+render();
+// Announce status change to screen readers
+const status = t.completed ? 'completed' : 'active';
+announce(`Task "${t.text}" marked as ${status}`);
+});
+    
+const span = document.createElement('span');
+span.className = 'text';
+span.textContent = t.text;
+span.title = 'Double-click to edit';
+span.setAttribute('role', 'textbox');
+span.setAttribute('aria-label', `Task: ${t.text}. Double click to edit.`);
+span.addEventListener('dblclick', ()=>{
+span.setAttribute('contenteditable','true');
+span.setAttribute('aria-label', 'Editing task. Press enter to save or escape to cancel.');
+span.focus();
+// place cursor at end
+const range = document.createRange();
+range.selectNodeContents(span); range.collapse(false);
+const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+});
+span.addEventListener('blur', ()=> finishEdit());
+span.addEventListener('keydown', (e)=>{
+if(e.key==='Enter'){ e.preventDefault(); finishEdit(); }
+if(e.key==='Escape'){ span.textContent = t.text; span.blur(); }
+});
+    
+function finishEdit(){
+if(span.getAttribute('contenteditable')!== 'true') return;
+const value = span.textContent.trim();
+if(!value){ // delete empty edits
+tasks = tasks.filter(x=>x.id!==t.id);
+announce(`Task deleted`);
+} else if (value !== t.text) {
+// Check for duplicate
+if (tasks.some(task => task.id !== t.id && task.text === value)) {
+showError("This task already exists");
+span.textContent = t.text;
+} else {
+t.text = value;
+announce(`Task updated to "${value}"`);
+}
+}
+span.removeAttribute('contenteditable');
+span.setAttribute('aria-label', `Task: ${t.text}. Double click to edit.`);
+save(); 
+render();
+}
+    
+const del = document.createElement('button');
+del.className = 'delete'; 
+del.textContent = 'Delete'; 
+del.ariaLabel = `Delete ${t.text}`;
+del.addEventListener('click', ()=>{ 
+tasks = tasks.filter(x=>x.id !== t.id); 
+save(); 
+announce(`Task "${t.text}" deleted`);
+render();
+});
+    
+li.append(cb, span, del);
+listEl.appendChild(li);
+}
+  
+// meta
+const total = tasks.length;
+const remaining = remainingCount();
+badgeEl.textContent = `${remaining} ${remaining === 1 ? 'task' : 'tasks'} remaining`;
+metaEl.textContent = `${total} total • ${tasks.filter(t=>t.completed).length} completed`;
+  
+// disable clear if nothing completed
+clearBtn.disabled = tasks.every(t=>!t.completed);
+  
+// update filter button active state and ARIA attributes
+for(const b of filterBtns){ 
+const isActive = b.dataset.filter===filter;
+b.classList.toggle('active', isActive);
+b.setAttribute('aria-selected', isActive);
+}
+}
+
+// ===== Actions =====
+function addTask(text){
+const t = text.trim(); 
+if(!t) {
+showError("Task cannot be empty");
+return;
+}
+  
+// Check for duplicate task
+if (tasks.some(task => task.text === t)) {
+showError("This task already exists");
+return;
+}
+  
+tasks.unshift({ id: uid(), text: t, completed:false });
+save(); 
+inputEl.value = '';
+addBtn.disabled = true;
+hideError();
+announce(`Task "${t}" added`);
+render();
+}
+
+function showError(message) {
+errorMessage.textContent = message;
+errorMessage.style.display = 'block';
+inputEl.classList.add('error');
+}
+
+function hideError() {
+errorMessage.style.display = 'none';
+inputEl.classList.remove('error');
+}
+
+function announce(message) {
+// Create live region for accessibility announcements
+let liveRegion = document.getElementById('a11y-announcements');
+if (!liveRegion) {
+liveRegion = document.createElement('div');
+liveRegion.id = 'a11y-announcements';
+liveRegion.setAttribute('aria-live', 'polite');
+liveRegion.setAttribute('aria-atomic', 'true');
+liveRegion.style.position = 'absolute';
+liveRegion.style.width = '1px';
+liveRegion.style.height = '1px';
+liveRegion.style.padding = '0';
+liveRegion.style.overflow = 'hidden';
+liveRegion.style.clip = 'rect(0, 0, 0, 0)';
+liveRegion.style.whiteSpace = 'nowrap';
+liveRegion.style.border = '0';
+document.body.appendChild(liveRegion);
+}
+  
+liveRegion.textContent = message;
+}
+
+addBtn.addEventListener('click', ()=> addTask(inputEl.value));
+inputEl.addEventListener('keydown', (e)=>{
+if(e.key==='Enter') addTask(inputEl.value);
+});
+inputEl.addEventListener('input', ()=>{ 
+addBtn.disabled = !inputEl.value.trim();
+hideError();
+});
+
+clearBtn.addEventListener('click', ()=>{
+const completedCount = tasks.filter(t=>t.completed).length;
+tasks = tasks.filter(t=>!t.completed); 
+save(); 
+announce(`Cleared ${completedCount} completed ${completedCount === 1 ? 'task' : 'tasks'}`);
+render();
+});
+
+filterBtns.forEach(b=> b.addEventListener('click', ()=>{ 
+filter = b.dataset.filter; 
+announce(`Showing ${filter} tasks`);
+render(); 
+}));
+
+// Seed example on first run
+if(tasks.length===0){
+tasks = [
+{ id: uid(), text: 'Review internship brief', completed:true },
+{ id: uid(), text: 'Design UI wireframe', completed:false },
+{ id: uid(), text: 'Implement add/edit/delete', completed:false }
+];
+save();
+}
+
+// Initial render
+render(); 
+addBtn.disabled = !inputEl.value.trim();
+</script>
+</body>
+</html>
